@@ -7,6 +7,7 @@ class Banco:
         try:
             self.conexao = psycopg2.connect(host=host, database=db, user='postgres', password='postgres')
             self.cursor = self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            self.conexao.set_client_encoding('UTF8')
         except:
             print("Não foi possivel conectar ao banco de dados.")
 
