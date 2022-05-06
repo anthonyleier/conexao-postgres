@@ -21,7 +21,7 @@ class BancoTestes(unittest.TestCase):
         self.assertIn(usuario3, dados)
 
     def test_selecionarParams(self):
-        query = "SELECT senha FROM usuario WHERE nome = %s AND email = %s;"
+        query = "SELECT * FROM usuario WHERE nome = %s AND email = %s;"
         nome1 = 'Tânia Castro'
         email1 = 'tania.castro@hotmail.com'
         senha1 = 'tania123'
@@ -37,13 +37,13 @@ class BancoTestes(unittest.TestCase):
         self.assertEqual(senha2, dados2[0]['senha'])
 
     def test_selecionarUm(self):
-        query = "SELECT senha FROM usuario WHERE email LIKE '%@gmail.com' ORDER BY id;"
+        query = "SELECT * FROM usuario WHERE email LIKE '%@gmail.com' ORDER BY id;"
         senha = 'eduarda123'
         dados = self.banco.selecionarUm(query)
         self.assertEqual(senha, dados['senha'])
 
     def test_selecionarUmParams(self):
-        query = "SELECT nome FROM usuario WHERE email = %s;"
+        query = "SELECT * FROM usuario WHERE email = %s;"
         nome = 'Matilde Oliveira'
         email = 'matilde.oliveira@hotmail.com'
         parametros = [email]
@@ -54,10 +54,9 @@ class BancoTestes(unittest.TestCase):
         query = "INSERT INTO usuario (nome, email, senha) VALUES ('Evelyn Cruz', 'evelyn.cruz@gmail.com', 'evelyn123');"
         self.banco.executar(query)
 
-        query2 = "SELECT email FROM usuario WHERE nome = 'Evelyn Cruz';"
+        query2 = "SELECT * FROM usuario WHERE nome = 'Evelyn Cruz';"
         dados = self.banco.selecionarUm(query2)
         email = 'evelyn.cruz@gmail.com'
-
         self.assertEqual(email, dados['email'])
 
     def test_executarParams(self):
@@ -66,10 +65,9 @@ class BancoTestes(unittest.TestCase):
         parametros = [email]
         self.banco.executar(query, parametros)
 
-        query2 = "SELECT email FROM usuario WHERE nome = 'Evelyn Cruz';"
+        query2 = "SELECT * FROM usuario WHERE senha = 'evelyn123';"
         dados = self.banco.selecionarUm(query2)
-
-        self.assertEqual(None, dados['email'])
+        self.assertEqual(None, dados)
 
     def test_fecharConexao(self):
         self.assertEqual(self.banco.conexao.closed, 0)
