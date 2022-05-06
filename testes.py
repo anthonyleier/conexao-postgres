@@ -7,6 +7,8 @@ class BancoTestes(unittest.TestCase):
         ipAcesso = 'localhost'
         nomeBanco = 'sistema'
         self.banco = Banco(ipAcesso, nomeBanco)
+        with open('estrutura.sql', 'r', encoding='utf-8') as arquivo:
+            self.banco.executar(arquivo.read())
 
     def test_selecionar(self):
         query = "SELECT nome, email, senha FROM usuario;"
@@ -20,45 +22,59 @@ class BancoTestes(unittest.TestCase):
 
     def test_selecionarParams(self):
         query = "SELECT senha FROM usuario WHERE nome = %s AND email = %s;"
-        nome = 'Tânia Castro'
-        email = 'tania.castro@hotmail.com'
-        senha = 'tania123'
-        parametros = [nome, email]
-        dados = self.banco.selecionar(query, parametros)
-        print(dados)
-        self.assertEqual(senha, dados[0]['senha'])
+        nome1 = 'Tânia Castro'
+        email1 = 'tania.castro@hotmail.com'
+        senha1 = 'tania123'
+        parametros = [nome1, email1]
+        dados1 = self.banco.selecionar(query, parametros)
+        self.assertEqual(senha1, dados1[0]['senha'])
 
-    # def test_selecionarUm(self):
-    #     query = "SELECT email FROM usuario WHERE email LIKE '%@gmail.com' ORDER BY id;"
-    #     email = 'eduarda.azevedo@gmail.com'
-    #     self.banco.selecionar(query)
-    #     self.assertIn(email, self.banco.selecionar(query))
+        nome2 = 'Erick Gonçalves'
+        email2 = 'erick.goncalves@hotmail.com'
+        senha2 = 'erick123'
+        parametros = [nome2, email2]
+        dados2 = self.banco.selecionar(query, parametros)
+        self.assertEqual(senha2, dados2[0]['senha'])
 
-    # def test_selecionarUmParams(self):
-    #     query = "SELECT email FROM usuario WHERE email LIKE '%@gmail.com' ORDER BY id;"
-    #     email = 'eduarda.azevedo@gmail.com'
-    #     parametros = [email]
-    #     self.banco.selecionar(query, parametros)
-    #     self.assertIn(email, self.banco.selecionar(query))
+    def test_selecionarUm(self):
+        query = "SELECT senha FROM usuario WHERE email LIKE '%@gmail.com' ORDER BY id;"
+        senha = 'eduarda123'
+        dados = self.banco.selecionarUm(query)
+        self.assertEqual(senha, dados['senha'])
 
-    # def test_executar(self):
-    #     query = "INSERT INTO usuario (nome, email, senha) VALUES ('Evelyn', 'evelyn@gmail.com', 'evelyn123';"
-    #     self.banco.executar(query)
-    #     query2 = "SELECT email FROM usuario WHERE email = 'evelyn@gmail.com';"
-    #     email = self.banco.selecionarUm(query2)
-    #     self.assertEqual(email, 'evelyn@gmail.com')
+    def test_selecionarUmParams(self):
+        query = "SELECT nome FROM usuario WHERE email = %s;"
+        nome = 'Matilde Oliveira'
+        email = 'matilde.oliveira@hotmail.com'
+        parametros = [email]
+        dados = self.banco.selecionarUm(query, parametros)
+        self.assertEqual(nome, dados['nome'])
 
-    # def test_executarParams(self):
-    #     query = "INSERT INTO usuario (nome, email, senha) VALUES ('Martim', 'martim@gmail.com', 'martim123';"
-    #     self.banco.executar(query)
-    #     query2 = "SELECT email FROM usuario WHERE email = 'martim@gmail.com';"
-    #     email = self.banco.selecionarUm(query2)
-    #     self.assertEqual(email, 'martim@gmail.com')
+    def test_executar(self):
+        query = "INSERT INTO usuario (nome, email, senha) VALUES ('Evelyn Cruz', 'evelyn.cruz@gmail.com', 'evelyn123');"
+        self.banco.executar(query)
 
-    # def test_fecharConexao(self):
-    #     self.assertEqual(self.banco.conexao.closed, 0)
-    #     self.banco.fecharConexao()
-    #     self.assertEqual(self.banco.conexao.closed, 1)
+        query2 = "SELECT email FROM usuario WHERE nome = 'Evelyn Cruz';"
+        dados = self.banco.selecionarUm(query2)
+        email = 'evelyn.cruz@gmail.com'
+
+        self.assertEqual(email, dados['email'])
+
+    def test_executarParams(self):
+        query = "DELETE FROM usuario WHERE email = %s;"
+        email = 'evelyn.cruz@gmail.com'
+        parametros = [email]
+        self.banco.executar(query, parametros)
+
+        query2 = "SELECT email FROM usuario WHERE nome = 'Evelyn Cruz';"
+        dados = self.banco.selecionarUm(query2)
+
+        self.assertEqual(None, dados['email'])
+
+    def test_fecharConexao(self):
+        self.assertEqual(self.banco.conexao.closed, 0)
+        self.banco.fecharConexao()
+        self.assertEqual(self.banco.conexao.closed, 1)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,3 @@
-CREATE DATABASE sistema;
-
 DROP TABLE IF EXISTS usuario CASCADE;
 
 CREATE TABLE usuario (
