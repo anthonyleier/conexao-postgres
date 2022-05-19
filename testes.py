@@ -69,6 +69,11 @@ class BancoTestes(unittest.TestCase):
         dados = self.banco.selecionarUm(query2)
         self.assertEqual(None, dados)
 
+    def test_executarReturning(self):
+        query = "INSERT INTO usuario (nome, email, senha) VALUES ('Carolina Dias', 'carolina.dias@gmail.com', 'carolina123') RETURNING id;"
+        dados = self.banco.executar(query)
+        self.assertEqual(21, dados['id'])
+
     def test_fecharConexao(self):
         self.assertEqual(self.banco.conexao.closed, 0)
         self.banco.fecharConexao()
