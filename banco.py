@@ -3,9 +3,9 @@ import psycopg2.extras
 
 
 class Banco:
-    def __init__(self, host, db):
+    def __init__(self, host, database):
         try:
-            self.conexao = psycopg2.connect(host=host, database=db, user="postgres", password="postgres")
+            self.conexao = psycopg2.connect(host=host, database=database, user="postgres", password="postgres")
             self.cursor = self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         except:
             print("Não foi possivel conectar ao banco de dados.")
