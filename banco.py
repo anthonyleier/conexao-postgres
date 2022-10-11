@@ -3,15 +3,17 @@ import psycopg2.extras
 
 
 class Banco:
-    def __init__(self, host=None, database=None):
+    def __init__(self, host=None, database=None, encoding=None):
         if host and database:
-            self.abrirConexao(host, database)
+            self.abrirConexao(host, database, encoding)
 
-    def abrirConexao(self, host=None, database=None):
+    def abrirConexao(self, host=None, database=None, encoding=None):
         try:
             if host and database:
                 self.host = host
                 self.database = database
+
+            self.encoding = 'UTF8' if not encoding else encoding
 
             self.conexao = psycopg2.connect(
                 host=self.host,
@@ -19,6 +21,7 @@ class Banco:
                 user="postgres",
                 password="postgres")
 
+            self.conexao.set_client_encoding(self.encoding)
             self.cursor = self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         except Exception as erro:
@@ -39,14 +42,9 @@ class Banco:
             return self.selecionarSafe(query, parametros)
 
         except Exception as erro:
-            print(f"Erro inesperado no selecionar: {erro}")
+            print(f"Erro inesperado no selecionar: {erro} - {self.database} - {query}")
 
     def selecionarUmSafe(self, query, parametros=None):
-        if 'LIMIT' not in query:
-            if query[-1] == ';':
-                query = query[:-1]
-            query += ' LIMIT 1;'
-
         self.cursor.execute(query, parametros)
         resultado = self.cursor.fetchone()
         return resultado
@@ -61,7 +59,7 @@ class Banco:
             return self.selecionarUmSafe(query, parametros)
 
         except Exception as erro:
-            print(f"Erro inesperado no selecionarUm: {erro}")
+            print(f"Erro inesperado no selecionarUm: {erro} - {self.database} - {query}")
 
     def executarSafe(self, query, parametros=None):
         self.cursor.execute(query, parametros)
@@ -82,7 +80,7 @@ class Banco:
 
         except Exception as erro:
             self.conexao.rollback()
-            print(f"Erro inesperado no executar: {erro}")
+            print(f"Erro inesperado no executar: {erro} - {self.database} - {query}")
 
     def fecharConexao(self):
         try:
