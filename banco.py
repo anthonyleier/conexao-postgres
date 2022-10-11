@@ -45,7 +45,7 @@ class Banco:
         if 'LIMIT' not in query:
             if query[-1] == ';':
                 query = query[:-1]
-            query += 'LIMIT 1;'
+            query += ' LIMIT 1;'
 
         self.cursor.execute(query, parametros)
         resultado = self.cursor.fetchone()
