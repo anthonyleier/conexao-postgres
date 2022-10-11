@@ -3,6 +3,10 @@ import psycopg2.extras
 
 
 class Banco:
+    def __init__(self, host=None, database=None):
+        if host and database:
+            self.abrirConexao(host, database)
+
     def abrirConexao(self, host=None, database=None):
         try:
             if host and database:
