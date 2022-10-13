@@ -42,6 +42,7 @@ class Banco:
             return self.selecionarSafe(query, parametros)
 
         except Exception as erro:
+            self.conexao.rollback()
             print(f"Erro inesperado no selecionar: {erro} - {self.database} - {query}")
 
     def selecionarUmSafe(self, query, parametros=None):
@@ -59,6 +60,7 @@ class Banco:
             return self.selecionarUmSafe(query, parametros)
 
         except Exception as erro:
+            self.conexao.rollback()
             print(f"Erro inesperado no selecionarUm: {erro} - {self.database} - {query}")
 
     def executarSafe(self, query, parametros=None):
