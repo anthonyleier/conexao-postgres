@@ -1,11 +1,26 @@
 import psycopg2
 import psycopg2.extras
+from functools import wraps
 
 
 class Banco:
     def __init__(self, host=None, database=None, encoding=None):
         if host and database:
             self.abrirConexao(host, database, encoding)
+
+    def tentarReconectar(funcao):
+        def decorator(*args, **kwargs):
+            try:
+                resultado = funcao(*args, **kwargs)
+                return resultado
+
+            except psycopg2.InterfaceError as erro:
+                print(f"A conexão foi fechada inexperadamente, tentando reabrir: {erro}")
+                args[0].reconectar()
+                resultado = funcao(*args, **kwargs)
+                return resultado
+
+        return decorator
 
     def abrirConexao(self, host=None, database=None, encoding=None):
         try:
@@ -27,58 +42,37 @@ class Banco:
         except Exception as erro:
             print(f"Não foi possivel conectar ao banco de dados: {erro}")
 
-    def selecionarSafe(self, query, parametros=None):
-        self.cursor.execute(query, parametros)
-        resultado = self.cursor.fetchall()
-        return resultado
-
+    @tentarReconectar
     def selecionar(self, query, parametros=None):
         try:
-            return self.selecionarSafe(query, parametros)
-
-        except psycopg2.InterfaceError as erro:
-            print(f"A conexão foi fechada inexperadamente, tentando reabrir: {erro}")
-            self.reconectar()
-            return self.selecionarSafe(query, parametros)
+            self.cursor.execute(query, parametros)
+            resultado = self.cursor.fetchall()
+            return resultado
 
         except Exception as erro:
             self.conexao.rollback()
             print(f"Erro inesperado no selecionar: {erro} - {self.database} - {query}")
 
-    def selecionarUmSafe(self, query, parametros=None):
-        self.cursor.execute(query, parametros)
-        resultado = self.cursor.fetchone()
-        return resultado
-
+    @tentarReconectar
     def selecionarUm(self, query, parametros=None):
         try:
-            return self.selecionarUmSafe(query, parametros)
-
-        except psycopg2.InterfaceError as erro:
-            print(f"A conexão foi fechada inexperadamente, tentando reabrir: {erro}")
-            self.reconectar()
-            return self.selecionarUmSafe(query, parametros)
+            self.cursor.execute(query, parametros)
+            resultado = self.cursor.fetchone()
+            return resultado
 
         except Exception as erro:
             self.conexao.rollback()
             print(f"Erro inesperado no selecionarUm: {erro} - {self.database} - {query}")
 
-    def executarSafe(self, query, parametros=None):
-        self.cursor.execute(query, parametros)
-        self.conexao.commit()
-        retorno = "RETURNING"
-
-        if retorno in query:
-            return self.cursor.fetchone()
-
+    @tentarReconectar
     def executar(self, query, parametros=None):
         try:
-            return self.executarSafe(query, parametros)
+            self.cursor.execute(query, parametros)
+            self.conexao.commit()
+            retorno = "RETURNING"
 
-        except psycopg2.InterfaceError as erro:
-            print(f"A conexão foi fechada inexperadamente, tentando reabrir: {erro}")
-            self.reconectar()
-            return self.executarSafe(query, parametros)
+            if retorno in query:
+                return self.cursor.fetchone()
 
         except Exception as erro:
             self.conexao.rollback()
