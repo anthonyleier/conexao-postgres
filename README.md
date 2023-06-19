@@ -1,6 +1,6 @@
 # conexao-postgres
 
-Este é um código em Python que cria uma classe Banco para se conectar a um banco de dados PostgreSQL usando a biblioteca psycopg2. A classe possui métodos para selecionar dados (selecionar e selecionarUm) e executar comandos (executar) no banco de dados, além de métodos para abrir e fechar a conexão com o banco (abrirConexao e fecharConexao, respectivamente). Também há um decorador tentarReconectar que trata erros de conexão e tenta reconectar automaticamente.
+Este é um código em Python que cria uma classe Banco para se conectar a um banco de dados PostgreSQL usando a biblioteca psycopg2. A classe possui métodos para selecionar dados (selecionar e selecionar_um) e executar comandos (executar) no banco de dados, além de métodos para abrir e fechar a conexão com o banco (abrir_conexao e fechar_conexao, respectivamente). Também há um decorador tentar_reconectar que trata erros de conexão e tenta reconectar automaticamente.
 
 # Selecionar
 Para usar esta classe, é preciso instalar a biblioteca psycopg2 e criar uma instância da classe passando os parâmetros de conexão com o banco de dados (host, nome do banco de dados, etc.). Exemplo:
@@ -14,15 +14,15 @@ banco = Banco(host='localhost', database='meubanco')
 resultado = banco.selecionar("SELECT * FROM minha_tabela")
 print(resultado)
 
-banco.fecharConexao()
+banco.fechar_conexao()
 ```
 
 Este código criaria uma instância da classe Banco conectada ao banco de dados meubanco no host localhost. Em seguida, executa uma consulta para selecionar todos os registros da tabela minha_tabela e imprime o resultado. Finalmente, fecha a conexão com o banco.
 
 # Selecionar Um
-A função selecionarUm é utilizada para executar uma query que espera um único resultado como resposta e retorna apenas uma única linha. Já a função selecionar é utilizada para executar uma query que retorna múltiplas linhas.
+A função selecionar_um é utilizada para executar uma query que espera um único resultado como resposta e retorna apenas uma única linha. Já a função selecionar é utilizada para executar uma query que retorna múltiplas linhas.
 
-Um exemplo de uso da função selecionarUm seria para buscar os dados de um usuário a partir do seu ID. Suponha que temos uma tabela usuarios com os campos id, nome e email. Para buscar os dados de um usuário a partir de seu ID, poderíamos fazer:
+Um exemplo de uso da função selecionar_um seria para buscar os dados de um usuário a partir do seu ID. Suponha que temos uma tabela usuarios com os campos id, nome e email. Para buscar os dados de um usuário a partir de seu ID, poderíamos fazer:
 
 ```python
 banco = Banco(host='localhost', database='meubanco')
@@ -30,10 +30,9 @@ banco = Banco(host='localhost', database='meubanco')
 usuario_id = 1
 query = "SELECT * FROM usuarios WHERE id = %s"
 
-usuario = banco.selecionarUm(query, (usuario_id,))
+usuario = banco.selecionar_um(query, (usuario_id,))
 print(usuario)
 ```
-
 
 # Executar
 Nesse exemplo, estamos criando uma instância da classe Banco, passando os parâmetros necessários para conectar ao banco de dados. Depois, criamos a variável query com o comando SQL que queremos executar, que é uma inserção na tabela clientes. Como a query utiliza placeholders %s, também precisamos criar a variável parametros, que contém os valores que serão substituídos nesses placeholders.

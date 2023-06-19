@@ -5,23 +5,23 @@ import psycopg2.extras
 class Banco:
     def __init__(self, host=None, database=None, encoding=None):
         if host and database:
-            self.abrirConexao(host, database, encoding)
+            self.abrir_conexao(host, database, encoding)
 
-    def tentarReconectar(funcao):
+    def tentar_reconectar(funcao):
         def decorator(*args, **kwargs):
             try:
                 resultado = funcao(*args, **kwargs)
                 return resultado
 
             except psycopg2.InterfaceError as erro:
-                print(f"A conexão foi fechada inexperadamente, tentando reabrir: {erro}")
+                print(f"A conexao foi fechada inexperadamente, tentando reabrir: {erro}")
                 args[0].reconectar()
                 resultado = funcao(*args, **kwargs)
                 return resultado
 
         return decorator
 
-    def abrirConexao(self, host=None, database=None, encoding=None):
+    def abrir_conexao(self, host=None, database=None, encoding=None):
         try:
             if host and database:
                 self.host = host
@@ -39,9 +39,9 @@ class Banco:
             self.cursor = self.conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         except Exception as erro:
-            print(f"Não foi possivel conectar ao banco de dados: {erro}")
+            print(f"Nao foi possivel conectar ao banco de dados: {erro}")
 
-    @tentarReconectar
+    @tentar_reconectar
     def selecionar(self, query, parametros=None):
         try:
             self.cursor.execute(query, parametros)
@@ -52,8 +52,8 @@ class Banco:
             self.conexao.rollback()
             print(f"Erro inesperado no selecionar: {erro} - {self.database} - {query}")
 
-    @tentarReconectar
-    def selecionarUm(self, query, parametros=None):
+    @tentar_reconectar
+    def selecionar_um(self, query, parametros=None):
         try:
             self.cursor.execute(query, parametros)
             resultado = self.cursor.fetchone()
@@ -61,9 +61,9 @@ class Banco:
 
         except Exception as erro:
             self.conexao.rollback()
-            print(f"Erro inesperado no selecionarUm: {erro} - {self.database} - {query}")
+            print(f"Erro inesperado no selecionar_um: {erro} - {self.database} - {query}")
 
-    @tentarReconectar
+    @tentar_reconectar
     def executar(self, query, parametros=None):
         try:
             self.cursor.execute(query, parametros)
@@ -77,14 +77,14 @@ class Banco:
             self.conexao.rollback()
             print(f"Erro inesperado no executar: {erro} - {self.database} - {query}")
 
-    def fecharConexao(self):
+    def fechar_conexao(self):
         try:
             self.cursor.close()
             self.conexao.close()
 
         except Exception as erro:
-            print(f"Não foi possível fechar a conexão: {erro}")
+            print(f"Nao foi possivel fechar a conexao: {erro}")
 
     def reconectar(self):
-        self.fecharConexao()
-        self.abrirConexao()
+        self.fechar_conexao()
+        self.abrir_conexao()
