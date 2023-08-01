@@ -64,6 +64,20 @@ class Banco:
             print(f"Erro inesperado no selecionar_um: {erro} - {self.database} - {query}")
 
     @tentar_reconectar
+    def existe(self, query, parametros=None):
+        try:
+            self.cursor.execute(query, parametros)
+            resultado = self.cursor.fetchone()
+            if resultado and len(resultado) > 0:
+                return True
+            else:
+                return False
+
+        except Exception as erro:
+            self.conexao.rollback()
+            print(f"Erro inesperado no existe: {erro} - {self.database} - {query}")
+
+    @tentar_reconectar
     def executar(self, query, parametros=None):
         try:
             self.cursor.execute(query, parametros)
